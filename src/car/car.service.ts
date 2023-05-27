@@ -29,6 +29,7 @@ const selectedFields = {
   ownerId: true,
   eurRate: true,
   usdRate: true,
+  photo: true,
   model: {
     select: {
       model: true,

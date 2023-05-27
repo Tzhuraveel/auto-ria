@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Length,
   Max,
@@ -109,6 +110,10 @@ export class CarResponseDto {
 
   @ApiProperty({ required: true, type: String, example: 'car top' })
   description: string;
+
+  @ApiProperty({ required: false, type: String, example: 'some link' })
+  @IsOptional()
+  photo?: string;
 
   @ApiProperty({
     required: true,

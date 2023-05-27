@@ -13,6 +13,7 @@ export class ICar {
   ownerId: string;
   eurRate: Prisma.JsonValue;
   usdRate: Prisma.JsonValue;
+  photo?: string;
   modelId: string;
   markaId: string;
   model: { model: string };
