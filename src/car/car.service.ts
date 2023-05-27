@@ -14,6 +14,7 @@ import {
 } from '../core';
 import { CarDto, CarResponseDto } from './dto';
 import { UserService } from '../user';
+import { S3Service } from '../core';
 
 const selectedFields = {
   id: true,
@@ -63,6 +64,7 @@ export class CarService {
     private readonly currencyConverterService: CurrencyConverterService,
     private readonly filterProfanityService: FilterProfanityService,
     private readonly userService: UserService,
+    private readonly s3Service: S3Service,
   ) {}
 
   public async createCar(
@@ -174,5 +176,36 @@ export class CarService {
     }
 
     return this.toManyResponse(car);
+  }
+
+  public async uploadPhoto(
+    file: Express.Multer.File,
+    carId: string,
+    user: User,
+  ) {
+    const carFromDb = await this.prismaService.car.findFirst({
+      where: {
+        id: carId,
+        ownerId: user.id,
+      },
+    });
+
+    if (!carFromDb) {
+      throw new HttpException(
+        'Car not found or not belong this user',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const filePath = await this.s3Service.upload(file, 'car', carId);
+
+    await this.prismaService.car.update({
+      where: {
+        id: carId,
+      },
+      data: {
+        photo: filePath,
+      },
+    });
   }
 }

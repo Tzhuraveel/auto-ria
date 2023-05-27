@@ -1,14 +1,19 @@
 import {
   Body,
   Controller,
+  FileTypeValidator,
   Get,
   HttpStatus,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Query,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -29,6 +34,7 @@ import {
 import { CarService } from './car.service';
 import { CarDto, CarResponseDto } from './dto';
 import { Roles } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('car')
 @Controller('car')
@@ -93,5 +99,32 @@ export class CarController {
     res
       .status(info ? HttpStatus.UNPROCESSABLE_ENTITY : HttpStatus.CREATED)
       .json(info ? info : HttpStatus.CREATED);
+  }
+
+  @UseGuards(BearerGuard)
+  @ApiOperation({
+    description: 'Upload car photo',
+    summary: 'Upload photo',
+  })
+  @ApiCreatedResponse()
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('upload-photo/:carId')
+  private async uploadPhoto(
+    @Req() req,
+    @Res() res,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10000000000 }),
+          new FileTypeValidator({ fileType: 'image/jpeg' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Param('carId', ParseObjectIdPipe) carId: string,
+  ): Promise<CarResponseDto[]> {
+    await this.carService.uploadPhoto(file, carId, req.user);
+
+    return res.json(HttpStatus.CREATED).status(HttpStatus.CREATED);
   }
 }

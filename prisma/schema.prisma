@@ -34,6 +34,7 @@ model Car {
   currency     CurrencyCar
   eurRate      Json
   usdRate      Json
+  photo        String?
   owner        User        @relation(fields: [ownerId], references: [id])
   ownerId      String      @db.ObjectId
   marka        MarkaCar    @relation(fields: [markaId], references: [id])
