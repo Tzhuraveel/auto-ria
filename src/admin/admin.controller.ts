@@ -12,7 +12,7 @@ import { ManagerDto } from './dto/admin.dto';
 import { Roles } from '@prisma/client';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-ApiTags('admin');
+@ApiTags('admin')
 @UseGuards(BearerGuard, RolesGuard)
 @Controller('admin')
 export class AdminController {
